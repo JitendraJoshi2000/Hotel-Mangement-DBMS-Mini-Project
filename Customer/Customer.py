@@ -4,20 +4,20 @@ import Login
 import os
 
 class Customer_page(Tk):
-  def __init__(s,emailId,password):
+  def __init__(self,emailId,password):
     super().__init__()
-    s.geometry("%dx%d+0+0" % (s.winfo_screenwidth(), s.winfo_screenheight()))
-    s.title(f"Welcome to Maharaja Hotel, Customer {emailId}, {password}")
-    s.wm_iconbitmap("Burger.ico")
+    self.geometry("%dx%d+0+0" % (self.winfo_screenwidth(), self.winfo_screenheight()))
+    self.title(f"Welcome to Maharaja Hotel, Customer {emailId}, {password}")
+    self.wm_iconbitmap("Burger.ico")
 
     style_button = ttk.Style()
     style_button.configure("TButton",font = ("arial",10,"bold"),background="lightgreen")
   
-    s.customerEmail = emailId
-    s.customerpassword = password
+    self.customerEmail = emailId
+    self.customerpassword = password
 
     #================Title==============
-    title_frame = Frame(s, bd=8, bg="yellow", relief=GROOVE)
+    title_frame = Frame(self, bd=8, bg="yellow", relief=GROOVE)
     title_frame.pack(side=TOP, fill="x")
     
     logout_frame = Frame(title_frame, bg="yellow")
@@ -28,7 +28,7 @@ class Customer_page(Tk):
     login_name.grid(row=0,column=0)
     
     logout_button = ttk.Button(logout_frame, text="LOGOUT"
-                            ,command=s.logout_operation)
+                            ,command=self.logout_operation)
     logout_button.grid(row=0,column=1,padx=10)
     
     title_label = Label(title_frame, text="Maharaja Hotel", 
@@ -36,7 +36,7 @@ class Customer_page(Tk):
     title_label.pack()
     
     #===============Menu===============
-    menu_frame = Frame(s,bd=8, bg="lightgreen", relief=GROOVE,width=(s.winfo_screenwidth()//2))
+    menu_frame = Frame(self,bd=8, bg="lightgreen", relief=GROOVE,width=(self.winfo_screenwidth()//2))
     menu_frame.pack(side='left',fill='both')
     
     menu_label = Label(menu_frame, text="Menu", 
@@ -50,7 +50,7 @@ class Customer_page(Tk):
                         font=("arial", 12, "bold"),bg = "lightgreen", fg="blue")
     combo_lable.grid(row=0,column=0,padx=10)
     
-    s.menuCategory = StringVar()
+    self.menuCategory = StringVar()
     menu_category = ["Tea & Coffee","Beverages","Fast Food","South Indian","Starters","Main Course","Dessert"]
 
     menu_category_dict = {"Tea & Coffee":"1 Tea & Coffee.txt","Beverages":"2 Beverages.txt",
@@ -62,15 +62,15 @@ class Customer_page(Tk):
     for i in menu_category:
         order_dict[i] = {}
     combo_menu = ttk.Combobox(menu_category_frame,values=menu_category,
-                                textvariable=s.menuCategory)
+                                textvariable=self.menuCategory)
     combo_menu.grid(row=0,column=1,padx=30)
     
     show_button = ttk.Button(menu_category_frame, text="Show",width=10,
-                            command=s.show_button_operation)
+                            command=self.show_button_operation)
     show_button.grid(row=0,column=2,padx=60)
     
     show_all_button = ttk.Button(menu_category_frame, text="Show All",
-                            width=10,command=s.load_menu)
+                            width=10,command=self.load_menu)
     show_all_button.grid(row=0,column=3,padx=(10,50))
     
     ############################# Menu Tabel ##########################################
@@ -84,33 +84,33 @@ class Customer_page(Tk):
     style.configure("Treeview.Heading",font=("arial",13, "bold"))
     style.configure("Treeview",font=("arial",12),rowheight=25)
     
-    s.menu_tabel = ttk.Treeview(menu_tabel_frame,style = "Treeview",
+    self.menu_tabel = ttk.Treeview(menu_tabel_frame,style = "Treeview",
                 columns =("name","price","category"),xscrollcommand=scrollbar_menu_x.set,
                 yscrollcommand=scrollbar_menu_y.set)
     
-    s.menu_tabel.heading("name",text="Name")
-    s.menu_tabel.heading("price",text="Price")
-    s.menu_tabel["displaycolumns"]=("name", "price")
-    s.menu_tabel["show"] = "headings"
-    s.menu_tabel.column("price",width=50,anchor='center')
+    self.menu_tabel.heading("name",text="Name")
+    self.menu_tabel.heading("price",text="Price")
+    self.menu_tabel["displaycolumns"]=("name", "price")
+    self.menu_tabel["show"] = "headings"
+    self.menu_tabel.column("price",width=50,anchor='center')
     
     scrollbar_menu_x.pack(side=BOTTOM,fill=X)
     scrollbar_menu_y.pack(side=RIGHT,fill=Y)
     
-    scrollbar_menu_x.configure(command=s.menu_tabel.xview)
-    scrollbar_menu_y.configure(command=s.menu_tabel.yview)
+    scrollbar_menu_x.configure(command=self.menu_tabel.xview)
+    scrollbar_menu_y.configure(command=self.menu_tabel.yview)
     
-    s.menu_tabel.pack(fill=BOTH,expand=1)
+    self.menu_tabel.pack(fill=BOTH,expand=1)
     
     
     #menu_tabel.insert('',END,values=["Masala Dosa","50"])
-    s.load_menu()
-    s.menu_tabel.bind("<ButtonRelease-1>",s.load_item_from_menu)
+    self.load_menu()
+    self.menu_tabel.bind("<ButtonRelease-1>",self.load_item_from_menu)
     
     ###########################################################################################
     
     #===============Item Frame=============
-    item_frame = Frame(s,bd=8, bg="lightgreen", relief=GROOVE)
+    item_frame = Frame(self,bd=8, bg="lightgreen", relief=GROOVE)
     item_frame.pack(fill='x',anchor=SE)
     
     item_title_label = Label(item_frame, text="Item", 
@@ -154,23 +154,23 @@ class Customer_page(Tk):
     item_frame3.pack(fill=X)
     
     add_button = ttk.Button(item_frame3, text="Add Item"
-                            ,command=s.add_button_operation)
+                            ,command=self.add_button_operation)
     add_button.grid(row=0,column=0,padx=(40,25),pady=30)
     
     remove_button = ttk.Button(item_frame3, text="Remove Item"
-                            ,command=s.remove_button_operation)
+                            ,command=self.remove_button_operation)
     remove_button.grid(row=0,column=1,padx=25,pady=30)
     
     update_button = ttk.Button(item_frame3, text="Update Quantity"
-                            ,command=s.update_button_operation)
+                            ,command=self.update_button_operation)
     update_button.grid(row=0,column=2,padx=25,pady=30)
     
     clear_button = ttk.Button(item_frame3, text="Clear",
-                            width=8,command=s.clear_button_operation)
+                            width=8,command=self.clear_button_operation)
     clear_button.grid(row=0,column=3,padx=25,pady=30)
     
     #==============Order Frame=====================
-    order_frame = Frame(s,bd=8, bg="lightgreen", relief=GROOVE)
+    order_frame = Frame(self,bd=8, bg="lightgreen", relief=GROOVE)
     order_frame.pack(fill='both',anchor=SE,expand=True)
     
     order_title_label = Label(order_frame, text="Your Order", 
@@ -198,7 +198,7 @@ class Customer_page(Tk):
     order_tabel.column("quantity",width=100,anchor='center', stretch=NO)
     order_tabel.column("price",width=100,anchor='center', stretch=NO)
     
-    order_tabel.bind("<ButtonRelease-1>",s.load_item_from_order)
+    order_tabel.bind("<ButtonRelease-1>",self.load_item_from_order)
     
     scrollbar_order_x.pack(side=BOTTOM,fill=X)
     scrollbar_order_y.pack(side=RIGHT,fill=Y)
@@ -222,21 +222,21 @@ class Customer_page(Tk):
     total_price_entry.pack(side='left',anchor=N,padx=0,pady=20)
     
     bill_button = ttk.Button(order_frame, text="Place Order",
-                            command=s.bill_button_operation)
+                            command=self.bill_button_operation)
     bill_button.pack(side='left',anchor=N,padx=50,pady=20)
     
-    cancel_button = ttk.Button(order_frame, text="Delete Order",command=s.cancel_button_operation)
+    cancel_button = ttk.Button(order_frame, text="Delete Order",command=self.cancel_button_operation)
     cancel_button.pack(side='left',anchor=N,padx=0,pady=20)
     
     #====================Frontend code ends=====================
         
 
-  def show_button_operation(s):
-    pass
+  def show_button_operation(self):
+    return
     
-  def load_menu(s):
-    s.menuCategory.set("")
-    s.menu_tabel.delete(*s.menu_tabel.get_children())
+  def load_menu(self):
+    self.menuCategory.set("")
+    self.menu_tabel.delete(*self.menu_tabel.get_children())
     menu_file_list = os.listdir("Menu")
     for file in menu_file_list:
         f = open("Menu\\" + file , "r")
@@ -244,7 +244,7 @@ class Customer_page(Tk):
         while True:
             line = f.readline()
             if(line==""):
-                s.menu_tabel.insert('',END,values=["","",""])
+                self.menu_tabel.insert('',END,values=["","",""])
                 break
             elif (line=="\n"):
                 continue
@@ -259,36 +259,36 @@ class Customer_page(Tk):
                 name = line[:line.rfind(" ")]
                 price = line[line.rfind(" ")+1:-3]
             
-            s.menu_tabel.insert('',END,values=[name,price,category])
+            self.menu_tabel.insert('',END,values=[name,price,category])
         #menu_tabel.insert('',END,values=["Masala Dosa","50"])
 
-  def load_item_from_menu(s):
-    pass
+  def load_item_from_menu(self):
+    return
 
-  def add_button_operation(s):
-    pass
+  def add_button_operation(self):
+    return
 
-  def remove_button_operation(s):
-    pass
+  def remove_button_operation(self):
+    return
 
-  def update_button_operation(s):
-    pass
+  def update_button_operation(self):
+    return
 
-  def clear_button_operation(s):
-    pass
+  def clear_button_operation(self):
+    return
 
-  def load_item_from_order(s):
-    pass
+  def load_item_from_order(self):
+    return
 
-  def bill_button_operation(s):
-    pass
+  def bill_button_operation(self):
+    return
 
-  def cancel_button_operation(s):
-    pass
+  def cancel_button_operation(self):
+    return
   
-  def logout_operation(s):
-    s.destroy()
-    s = Login.Login_page()
+  def logout_operation(self):
+    self.destroy()
+    self = Login.Login_page()
     
 '''
 # For Test

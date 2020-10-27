@@ -1,19 +1,20 @@
 from tkinter import *
 from tkinter import ttk
-import Admin,Waiter
+import Admin
+import Waiter
 
 class Login_page(Tk):
-  def __init__(s):
+  def __init__(self):
     super().__init__()
-    s.geometry("%dx%d+0+0" % (s.winfo_screenwidth(), s.winfo_screenheight()))
-    s.title("Maharaja Hotel Staff Protal")
-    s.wm_iconbitmap("Burger.ico")
+    self.geometry("%dx%d+0+0" % (self.winfo_screenwidth(), self.winfo_screenheight()))
+    self.title("Maharaja Hotel Staff Protal")
+    self.wm_iconbitmap("Burger.ico")
     
     style_button = ttk.Style()
     style_button.configure("TButton",font = ("arial",10,"bold"),
     background="lightgreen")
     
-    main_frame = Frame(s, bd=8, bg="lightgreen", relief=GROOVE)
+    main_frame = Frame(self, bd=8, bg="lightgreen", relief=GROOVE)
     main_frame.pack(fill="both",expand=True)
     
     #================Title==============
@@ -36,10 +37,10 @@ class Login_page(Tk):
                     font=("arial", 15, "bold"), fg="blue")
     username_lable.grid(row=0,column=0)
 
-    s.username = StringVar()
-    s.username.set("")
+    self.username = StringVar()
+    self.username.set("")
     username_entry = Entry(login_frame,width=20,font="arial 15",bd=5,
-                                textvariable=s.username)
+                                textvariable=self.username)
     username_entry.grid(row=0,column=1,padx=(10,0))
     
     # Password
@@ -47,27 +48,27 @@ class Login_page(Tk):
                     font=("arial", 15, "bold"), fg="blue")
     password_lable.grid(row=1,column=0,pady=(50,10))
 
-    s.password = StringVar()
-    s.password.set("")
+    self.password = StringVar()
+    self.password.set("")
     password_entry = Entry(login_frame,show="*",width=20,font="arial 15",bd=5,
-                                textvariable=s.password)
+                                textvariable=self.password)
     password_entry.grid(row=1,column=1,pady=(50,10),padx=(10,0))
 
 
-    login_button = ttk.Button(main_frame,text = "LOGIN",command=s.login)
+    login_button = ttk.Button(main_frame,text = "LOGIN",command=self.login)
     login_button.pack(pady=30)
     
-  def login(s):
-    print(s.username.get(),s.password.get())
-    username = s.username.get()
-    password = s.password.get()
+  def login(self):
+    print(self.username.get(),self.password.get())
+    username = self.username.get()
+    password = self.password.get()
     if username=='admin' and password=='admin':
-      s.destroy()
-      s = Admin.Admin_page()
+      self.destroy()
+      self = Admin.Admin_page()
     else:
       # Get Data from database
-      s.destroy()
-      s = Waiter.Waiter_page(username,password)
+      self.destroy()
+      self = Waiter.Waiter_page(username,password)
       #s = Customer.Customer_page(username,password)
     
     

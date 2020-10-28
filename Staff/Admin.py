@@ -3,19 +3,19 @@ from tkinter import ttk
 import Login
 
 class Admin_page(Tk):
-  def __init__(s):
+  def __init__(self):
     super().__init__()
     
-    s.geometry("%dx%d+0+0" % (s.winfo_screenwidth(), s.winfo_screenheight()))
-    s.title("Maharaja Hotel Admin")
-    s.wm_iconbitmap("Burger.ico")
+    self.geometry("%dx%d+0+0" % (self.winfo_screenwidth(), self.winfo_screenheight()))
+    self.title("Maharaja Hotel Admin")
+    self.wm_iconbitmap("Burger.ico")
     
     style_button = ttk.Style()
     style_button.configure("TButton",font = ("arial",10,"bold"),
     background="lightgreen")
     
     #================Title==============
-    title_frame = Frame(s, bd=8, bg="yellow", relief=GROOVE)
+    title_frame = Frame(self, bd=8, bg="yellow", relief=GROOVE)
     title_frame.pack(side=TOP, fill="x")
     
     logout_frame = Frame(title_frame, bg="yellow")
@@ -26,7 +26,7 @@ class Admin_page(Tk):
     login_name.grid(row=0,column=0)
     
     logout_button = ttk.Button(logout_frame, text="LOGOUT"
-                            ,command=s.logout_operation)
+                            ,command=self.logout_operation)
     logout_button.grid(row=0,column=1,padx=10)
     
     title_label = Label(title_frame, text="Maharaja Hotel", 
@@ -34,9 +34,9 @@ class Admin_page(Tk):
     title_label.pack()
     
     
-  def logout_operation(s):
-    s.destroy()
-    s = Login.Login_page()
+  def logout_operation(self):
+    self.destroy()
+    self = Login.Login_page()
     
     
     

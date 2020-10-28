@@ -1,26 +1,30 @@
 from tkinter import *
 from tkinter import ttk
+from tkinter import messagebox
 import Login
+import re
+
+regex = '^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$'
 
 class SignUp_page(Tk):
-  def __init__(s):
+  def __init__(self):
     super().__init__()
-    s.geometry("%dx%d+0+0" % (s.winfo_screenwidth(), s.winfo_screenheight()))
-    s.title("Welcome to Maharaja Hotel")
-    s.wm_iconbitmap("Burger.ico")
+    self.geometry("%dx%d+0+0" % (self.winfo_screenwidth(), self.winfo_screenheight()))
+    self.title("Welcome to Maharaja Hotel")
+    self.wm_iconbitmap("Burger.ico")
     
     style_button = ttk.Style()
     style_button.configure("TButton",font = ("arial",10,"bold"),
     background="lightgreen")
     
-    main_frame = Frame(s, bd=8, bg="lightgreen", relief=GROOVE)
+    main_frame = Frame(self, bd=8, bg="lightgreen", relief=GROOVE)
     main_frame.pack(fill="both",expand=True)
     
     #================Title==============
     title_frame = Frame(main_frame, bd=8, bg="yellow", relief=GROOVE)
     title_frame.pack(side=TOP, fill="x")
     
-    back_button = ttk.Button(title_frame,text = "<<== Back",command=s.back_function)
+    back_button = ttk.Button(title_frame,text = "<<== Back",command=self.back_function)
     back_button.pack(side=LEFT)
 
     title_label = Label(title_frame, text="Maharaja Hotel", 
@@ -40,10 +44,10 @@ class SignUp_page(Tk):
                     font=("arial", 15, "bold"), fg="blue")
     name_lable.grid(row=0,column=0,pady=(10,10))
 
-    s.name = StringVar()
-    s.name.set("")
+    self.name = StringVar()
+    self.name.set("")
     name_entry = Entry(signup_frame,width=20,font="arial 15",bd=5,
-                                textvariable=s.name)
+                                textvariable=self.name)
     name_entry.grid(row=0,column=1,pady=(10,10),padx=(10,0))
     
     #EmailId
@@ -51,10 +55,10 @@ class SignUp_page(Tk):
                     font=("arial", 15, "bold"), fg="blue")
     email_lable.grid(row=1,column=0,pady=(10,10))
 
-    s.emailId = StringVar()
-    s.emailId.set("")
+    self.emailId = StringVar()
+    self.emailId.set("")
     email_entry = Entry(signup_frame,width=20,font="arial 15",bd=5,
-                                textvariable=s.emailId)
+                                textvariable=self.emailId)
     email_entry.grid(row=1,column=1,pady=(10,10),padx=(10,0))
     
     # Phone No
@@ -62,10 +66,10 @@ class SignUp_page(Tk):
                     font=("arial", 15, "bold"), fg="blue")
     phone_lable.grid(row=2,column=0,pady=(10,10))
 
-    s.phoneNo = StringVar()
-    s.phoneNo.set("")
+    self.phoneNo = StringVar()
+    self.phoneNo.set("")
     phone_entry = Entry(signup_frame,width=20,font="arial 15",bd=5,
-                                textvariable=s.phoneNo)
+                                textvariable=self.phoneNo)
     phone_entry.grid(row=2,column=1,pady=(10,10),padx=(10,0))
     
     # Password
@@ -73,10 +77,10 @@ class SignUp_page(Tk):
                     font=("arial", 15, "bold"), fg="blue")
     password_lable.grid(row=3,column=0,pady=(10,10))
 
-    s.password = StringVar()
-    s.password.set("")
-    password_entry = Entry(signup_frame,width=20,font="arial 15",bd=5,
-                                textvariable=s.password)
+    self.password = StringVar()
+    self.password.set("")
+    password_entry = Entry(signup_frame,show="*",width=20,font="arial 15",bd=5,
+                                textvariable=self.password)
     password_entry.grid(row=3,column=1,pady=(10,10),padx=(10,0))
 
     # Confirm Password
@@ -84,24 +88,79 @@ class SignUp_page(Tk):
                     font=("arial", 15, "bold"), fg="blue")
     confirm_password_lable.grid(row=4,column=0,pady=(10,10))
 
-    s.confirm_password = StringVar()
-    s.confirm_password.set("")
-    confirm_password_entry = Entry(signup_frame,width=20,font="arial 15",bd=5,
-                                textvariable=s.confirm_password)
+    self.confirm_password = StringVar()
+    self.confirm_password.set("")
+    confirm_password_entry = Entry(signup_frame,show="*",width=20,font="arial 15",bd=5,
+                                textvariable=self.confirm_password)
     confirm_password_entry.grid(row=4,column=1,pady=(10,10),padx=(10,0))
     
     # Register
-    register_button = ttk.Button(main_frame,text = "Register",command=s.register)
+    register_button = ttk.Button(main_frame,text = "Register",command=self.register)
     register_button.pack(pady=(30,10))
   
-  def back_function(s):
-    s.destroy()
-    s = Login.Login_page()  
-  def register(s):
-    print(s.name.get(),s.phoneNo.get(),s.emailId.get(),s.password.get())
-    s.destroy()
-    s = Login.Login_page()
+  def back_function(self):
+    self.destroy()
+    self = Login.Login_page() 
 
+  def check_email(self, email): 
+    if(re.search(regex,email)):  
+        return False    
+    else:  
+        return True  
+    
+  def check_password(self, password):
+    flag = 0
+    while True:   
+        if (len(password)<8): 
+            flag = -1
+            break
+        elif not re.search("[a-z]", password): 
+            flag = -1
+            break
+        elif not re.search("[A-Z]", password): 
+            flag = -1
+            break
+        elif not re.search("[0-9]", password): 
+            flag = -1
+            break
+        elif not re.search("[_@$]", password): 
+            flag = -1
+            break
+        elif re.search("\s", password): 
+            flag = -1
+            break
+        else: 
+            flag = 0
+            return False 
+            break
+      
+    if flag ==-1: 
+        return True
+
+  def check_fields(self):
+    if self.name.get()=="" or self.phoneNo.get()=="" or self.emailId.get()=="" or self.password.get()=="" or self.confirm_password.get()=="":
+      messagebox.showerror("input","Please enter all fields!")
+      return True
+    elif not self.phoneNo.get().isdigit():
+      messagebox.showerror("phone","Please enter valid Phone Number!")
+      return True
+    elif self.check_email(self.emailId.get()):
+      messagebox.showerror("email","Please enter valid Email Address!")
+      return True
+    elif self.check_password(self.password.get()):
+      messagebox.showerror("password","Password field should contain atleast one lowercase letter,uppercase letter,digit and one special charater")
+      return True
+    elif self.password.get()!=self.confirm_password.get():
+      messagebox.showerror("confirm_password","Password and Confirm Password fields should match!")
+      return True
+    return False
+
+  def register(self):
+    # print(self.name.get(),self.phoneNo.get(),self.emailId.get(),self.password.get())
+    if self.check_fields():
+      return
+    self.destroy()
+    self = Login.Login_page()
 
 '''
 # For Test

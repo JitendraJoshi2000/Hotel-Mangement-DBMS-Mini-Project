@@ -1,7 +1,6 @@
 from tkinter import *
 from tkinter import ttk
-import Admin
-import Waiter
+import Admin,Waiter,Chef
 
 class Login_page(Tk):
   def __init__(self):
@@ -65,6 +64,9 @@ class Login_page(Tk):
     if username=='admin' and password=='admin':
       self.destroy()
       self = Admin.Admin_page()
+    elif username=='chef' and password=='chef':
+      self.destroy()
+      self = Chef.Chef_page()
     else:
       # Get Data from database
       self.destroy()

@@ -35,6 +35,76 @@ class Waiter_page(Tk):
                         font=("times new roman", 20, "bold"),bg = "yellow", fg="red", pady=5)
     title_label.pack()
     
+    #=============== Customer Frame ===============
+    customer_frame = LabelFrame(self,text="Customer Details",font=("times new roman", 15, "bold"),
+                            bd=8, bg="lightblue", relief=GROOVE)
+    customer_frame.pack(side=TOP, fill="x")
+
+    table_no_lable = Label(customer_frame, text="Table No.", 
+                        font=("arial", 15, "bold"),bg = "lightblue", fg="blue")
+    table_no_lable.grid(row = 0, column = 0)
+
+    customerTable = IntVar()
+    customerTable.set(0)
+    table_no_entry = Entry(customer_frame,width=5,font="arial 15",bd=5,state=DISABLED,
+                                    textvariable=customerTable)
+    table_no_entry.grid(row = 0, column=1,padx=(10,100))
+    
+    customer_name_label = Label(customer_frame, text="Name", 
+                        font=("arial", 15, "bold"),bg = "lightblue", fg="blue")
+    customer_name_label.grid(row = 0, column = 2)
+
+    customerName = StringVar()
+    customerName.set("")
+    customer_name_entry = Entry(customer_frame,width=20,font="arial 15",bd=5,
+                                    textvariable=customerName)
+    customer_name_entry.grid(row = 0, column=3,padx=(10,100))
+
+    customer_email_label = Label(customer_frame, text="Email", 
+                        font=("arial", 15, "bold"),bg = "lightblue", fg="blue")
+    customer_email_label.grid(row = 0, column = 4)
+
+    customerEmail = StringVar()
+    customerEmail.set("")
+    customer_email_entry = Entry(customer_frame,width=20,font="arial 15",bd=5,
+                                    textvariable=customerEmail)
+    customer_email_entry.grid(row = 0, column=5,padx=(10,100))
+        
+    #=============== Table Frame ===============
+    ############################# Table Table ##########################################
+    tabel_frame = Frame(self,bd=8, bg="lightgreen", relief=GROOVE,width=50)
+    tabel_frame.pack(side='left',fill=BOTH,expand=1)
+    
+    scrollbar_menu_y = Scrollbar(tabel_frame,orient=VERTICAL)
+    
+    style = ttk.Style()
+    style.configure("Treeview.Heading",font=("arial",13, "bold"))
+    style.configure("Treeview",font=("arial",12),rowheight=25)
+    
+    self.tables_table = ttk.Treeview(tabel_frame,style = "Treeview",
+                columns =("tableName"),yscrollcommand=scrollbar_menu_y.set)
+    self.tables_table.heading("tableName",text="Tables")                
+    self.tables_table["displaycolumns"]=("tableName")
+    self.tables_table["show"] = "headings"
+    self.tables_table.column("tableName",width=100,anchor='center')
+    
+    scrollbar_menu_y.pack(side=RIGHT,fill=Y)
+    scrollbar_menu_y.configure(command=self.tables_table.yview)
+    
+    self.tables_table.pack(fill=BOTH,expand=1)
+    
+    self.tables_table.insert('',END,values=["Table 1"])
+    self.tables_table.insert('',END,values=["Table 2"])
+    self.tables_table.insert('',END,values=["Table 3"])
+    self.tables_table.insert('',END,values=["Table 4"])
+    self.tables_table.insert('',END,values=["Table 5"])
+
+    self.load_tabels()
+    self.tables_table.bind("<ButtonRelease-1>",self.load_table)
+    
+    ###########################################################################################
+    
+    
     #===============Menu===============
     menu_frame = Frame(self,bd=8, bg="lightgreen", relief=GROOVE,width=(self.winfo_screenwidth()//2))
     menu_frame.pack(side='left',fill='both')
@@ -134,7 +204,7 @@ class Waiter_page(Tk):
     
     item_rate_label = Label(item_frame2, text="Rate", 
                         font=("arial", 12, "bold"),bg = "lightgreen", fg="blue")
-    item_rate_label.grid(row=0,column=2,padx=(40,10))
+    item_rate_label.grid(row=0,column=2,padx=(25,10))
     
     itemRate = StringVar()
     itemRate.set("")
@@ -155,19 +225,19 @@ class Waiter_page(Tk):
     
     add_button = ttk.Button(item_frame3, text="Add Item"
                             ,command=self.add_button_operation)
-    add_button.grid(row=0,column=0,padx=(40,25),pady=30)
+    add_button.grid(row=0,column=0,padx=(40,20),pady=30)
     
     remove_button = ttk.Button(item_frame3, text="Remove Item"
                             ,command=self.remove_button_operation)
-    remove_button.grid(row=0,column=1,padx=25,pady=30)
+    remove_button.grid(row=0,column=1,padx=20,pady=30)
     
     update_button = ttk.Button(item_frame3, text="Update Quantity"
                             ,command=self.update_button_operation)
-    update_button.grid(row=0,column=2,padx=25,pady=30)
+    update_button.grid(row=0,column=2,padx=20,pady=30)
     
     clear_button = ttk.Button(item_frame3, text="Clear",
                             width=8,command=self.clear_button_operation)
-    clear_button.grid(row=0,column=3,padx=25,pady=30)
+    clear_button.grid(row=0,column=3,padx=20,pady=30)
     
     #==============Order Frame=====================
     order_frame = Frame(self,bd=8, bg="lightgreen", relief=GROOVE)
@@ -184,7 +254,7 @@ class Waiter_page(Tk):
     scrollbar_order_x = Scrollbar(order_tabel_frame,orient=HORIZONTAL)
     scrollbar_order_y = Scrollbar(order_tabel_frame,orient=VERTICAL)
     
-    order_tabel = ttk.Treeview(order_tabel_frame,
+    order_tabel = ttk.Treeview(order_tabel_frame,height=8,
                 columns =("name","rate","quantity","price","category"),xscrollcommand=scrollbar_order_x.set,
                 yscrollcommand=scrollbar_order_y.set)
     
@@ -221,7 +291,7 @@ class Waiter_page(Tk):
                                 width=10)
     total_price_entry.pack(side='left',anchor=N,padx=0,pady=20)
     
-    bill_button = ttk.Button(order_frame, text="Place Order",
+    bill_button = ttk.Button(order_frame, text="Bill",
                             command=self.bill_button_operation)
     bill_button.pack(side='left',anchor=N,padx=50,pady=20)
     
@@ -261,7 +331,6 @@ class Waiter_page(Tk):
                 price = line[line.rfind(" ")+1:-3]
             
             self.menu_tabel.insert('',END,values=[name,price,category])'''
-        #menu_tabel.insert('',END,values=["Masala Dosa","50"])
 
   def load_item_from_menu(self):
     return
@@ -290,6 +359,12 @@ class Waiter_page(Tk):
   def logout_operation(self):
     self.destroy()
     self = Login.Login_page()
+
+  def load_tabels(self):
+    return
+
+  def load_table(self):
+    pass
     
 
 # For Test

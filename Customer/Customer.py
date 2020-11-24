@@ -2,19 +2,33 @@ from tkinter import *
 from tkinter import ttk
 import Login
 import os
+import sqlite3
+import tkinter.messagebox as tmsg
+import datetime
 
 class Customer_page(Tk):
-  def __init__(self,emailId,password):
+  def __init__(self,emailId):
     super().__init__()
     self.geometry("%dx%d+0+0" % (self.winfo_screenwidth(), self.winfo_screenheight()))
-    self.title(f"Welcome to Maharaja Hotel, Customer {emailId}, {password}")
+    self.title(f"Welcome to Maharaja Hotel, Customer {emailId}")
     self.wm_iconbitmap("Burger.ico")
 
     style_button = ttk.Style()
     style_button.configure("TButton",font = ("arial",10,"bold"),background="lightgreen")
   
     self.customerEmail = emailId
-    self.customerpassword = password
+
+    db = sqlite3.connect('../hotel_database.db')
+    cursor = db.cursor()
+    cursor.execute("select distinct category from menu;")
+    menu_categories = cursor.fetchall()
+    self.menu_category = []
+    for i in menu_categories:
+      self.menu_category.append(str(i[0]))
+
+    self.order_dict = {}
+    for i in self.menu_category:
+        self.order_dict[i] = {}
 
     #================Title==============
     title_frame = Frame(self, bd=8, bg="yellow", relief=GROOVE)
@@ -51,17 +65,8 @@ class Customer_page(Tk):
     combo_lable.grid(row=0,column=0,padx=10)
     
     self.menuCategory = StringVar()
-    menu_category = ["Tea & Coffee","Beverages","Fast Food","South Indian","Starters","Main Course","Dessert"]
 
-    menu_category_dict = {"Tea & Coffee":"1 Tea & Coffee.txt","Beverages":"2 Beverages.txt",
-                "Fast Food":"3 Fast Food.txt","South Indian":"4 South Indian.txt",
-                "Starters":"5 Starters.txt","Main Course":"6 Main Course.txt",
-                "Dessert":"7 Dessert.txt"}
-
-    order_dict = {}
-    for i in menu_category:
-        order_dict[i] = {}
-    combo_menu = ttk.Combobox(menu_category_frame,values=menu_category,
+    combo_menu = ttk.Combobox(menu_category_frame,values=self.menu_category,
                                 textvariable=self.menuCategory)
     combo_menu.grid(row=0,column=1,padx=30)
     
@@ -124,30 +129,30 @@ class Customer_page(Tk):
                         font=("arial", 12, "bold"),bg = "lightgreen", fg="blue")
     item_name_label.grid(row=0,column=0,padx=(30,10))
     
-    itemCategory = StringVar()
-    itemCategory.set("")
+    self.itemCategory = StringVar()
+    self.itemCategory.set("")
     
-    itemName = StringVar()
-    itemName.set("")
-    item_name = Entry(item_frame2, font="arial 12",textvariable=itemName,state=DISABLED, width=25)
+    self.itemName = StringVar()
+    self.itemName.set("")
+    item_name = Entry(item_frame2, font="arial 12",textvariable=self.itemName,state=DISABLED, width=25)
     item_name.grid(row=0,column=1,padx=(0,10))
     
     item_rate_label = Label(item_frame2, text="Rate", 
                         font=("arial", 12, "bold"),bg = "lightgreen", fg="blue")
     item_rate_label.grid(row=0,column=2,padx=(40,10))
     
-    itemRate = StringVar()
-    itemRate.set("")
-    item_rate = Entry(item_frame2, font="arial 12",textvariable=itemRate,state=DISABLED, width=10)
+    self.itemRate = StringVar()
+    self.itemRate.set("")
+    item_rate = Entry(item_frame2, font="arial 12",textvariable=self.itemRate,state=DISABLED, width=10)
     item_rate.grid(row=0,column=3,padx=0)
     
     item_quantity_label = Label(item_frame2, text="Quantity", 
                         font=("arial", 12, "bold"),bg = "lightgreen", fg="blue")
     item_quantity_label.grid(row=1,column=0,padx=(30,0),pady=15)
     
-    itemQuantity = StringVar()
-    itemQuantity.set("")
-    item_quantity = Entry(item_frame2, font="arial 12",textvariable=itemQuantity, width=10)
+    self.itemQuantity = StringVar()
+    self.itemQuantity.set("")
+    item_quantity = Entry(item_frame2, font="arial 12",textvariable=self.itemQuantity, width=10)
     item_quantity.grid(row=1,column=1,padx=0)
     
     item_frame3 = Frame(item_frame, bg="lightgreen")
@@ -184,29 +189,29 @@ class Customer_page(Tk):
     scrollbar_order_x = Scrollbar(order_tabel_frame,orient=HORIZONTAL)
     scrollbar_order_y = Scrollbar(order_tabel_frame,orient=VERTICAL)
     
-    order_tabel = ttk.Treeview(order_tabel_frame,
+    self.order_tabel = ttk.Treeview(order_tabel_frame,
                 columns =("name","rate","quantity","price","category"),xscrollcommand=scrollbar_order_x.set,
                 yscrollcommand=scrollbar_order_y.set)
     
-    order_tabel.heading("name",text="Name")
-    order_tabel.heading("rate",text="Rate")
-    order_tabel.heading("quantity",text="Quantity")
-    order_tabel.heading("price",text="Price")
-    order_tabel["displaycolumns"]=("name", "rate","quantity","price")
-    order_tabel["show"] = "headings"
-    order_tabel.column("rate",width=100,anchor='center', stretch=NO)
-    order_tabel.column("quantity",width=100,anchor='center', stretch=NO)
-    order_tabel.column("price",width=100,anchor='center', stretch=NO)
+    self.order_tabel.heading("name",text="Name")
+    self.order_tabel.heading("rate",text="Rate")
+    self.order_tabel.heading("quantity",text="Quantity")
+    self.order_tabel.heading("price",text="Price")
+    self.order_tabel["displaycolumns"]=("name", "rate","quantity","price")
+    self.order_tabel["show"] = "headings"
+    self.order_tabel.column("rate",width=100,anchor='center', stretch=NO)
+    self.order_tabel.column("quantity",width=100,anchor='center', stretch=NO)
+    self.order_tabel.column("price",width=100,anchor='center', stretch=NO)
     
-    order_tabel.bind("<ButtonRelease-1>",self.load_item_from_order)
+    self.order_tabel.bind("<ButtonRelease-1>",self.load_item_from_order)
     
     scrollbar_order_x.pack(side=BOTTOM,fill=X)
     scrollbar_order_y.pack(side=RIGHT,fill=Y)
     
-    scrollbar_order_x.configure(command=order_tabel.xview)
-    scrollbar_order_y.configure(command=order_tabel.yview)
+    scrollbar_order_x.configure(command=self.order_tabel.xview)
+    scrollbar_order_y.configure(command=self.order_tabel.yview)
     
-    order_tabel.pack(fill=BOTH,expand=1)
+    self.order_tabel.pack(fill=BOTH,expand=1)
     
     # order_tabel.insert('',END,text="HEllo",values=["Masala Dosa","50","2","100"])
     ###########################################################################################
@@ -215,73 +220,171 @@ class Customer_page(Tk):
                         font=("arial", 12, "bold"),bg = "lightgreen", fg="blue")
     total_price_label.pack(side='left',anchor=N,padx=(20,5),pady=20)
     
-    totalPrice = StringVar()
-    totalPrice.set("")
-    total_price_entry = Entry(order_frame, font="arial 12",textvariable=totalPrice,state=DISABLED, 
+    self.totalPrice = StringVar()
+    self.totalPrice.set("")
+    total_price_entry = Entry(order_frame, font="arial 12",textvariable=self.totalPrice,state=DISABLED, 
                                 width=10)
     total_price_entry.pack(side='left',anchor=N,padx=0,pady=20)
     
-    bill_button = ttk.Button(order_frame, text="Place Order",
-                            command=self.bill_button_operation)
-    bill_button.pack(side='left',anchor=N,padx=50,pady=20)
+    place_order_button = ttk.Button(order_frame, text="Place Order",
+                            command=self.place_order_button_operation)
+    place_order_button.pack(side='left',anchor=N,padx=50,pady=20)
     
     cancel_button = ttk.Button(order_frame, text="Delete Order",command=self.cancel_button_operation)
     cancel_button.pack(side='left',anchor=N,padx=0,pady=20)
     
     #====================Frontend code ends=====================
         
-
   def show_button_operation(self):
-    return
+    category = self.menuCategory.get()
+    if category not in self.menu_category:
+        tmsg.showinfo("Error", "Please select valid Choice")
+    else:
+      self.menu_tabel.delete(*self.menu_tabel.get_children())
+      db = sqlite3.connect('../hotel_database.db')
+      cursor = db.cursor()
+      cursor.execute(f"select * from menu where category='{category}';")
+      rows = cursor.fetchall()
+      for row in rows:
+        self.menu_tabel.insert('',END,values=row)
     
   def load_menu(self):
-    self.menuCategory.set("")
     self.menu_tabel.delete(*self.menu_tabel.get_children())
-    menu_file_list = os.listdir("Menu")
-    for file in menu_file_list:
-        f = open("Menu\\" + file , "r")
-        category=""
-        while True:
-            line = f.readline()
-            if(line==""):
-                self.menu_tabel.insert('',END,values=["","",""])
-                break
-            elif (line=="\n"):
-                continue
-            elif(line[0]=='#'):
-                category = line[1:-1]
-                name = "\t\t"+line[:-1]
-                price = ""
-            elif(line[0]=='*'):
-                name = line[:-1]
-                price = ""
-            else:
-                name = line[:line.rfind(" ")]
-                price = line[line.rfind(" ")+1:-3]
-            
-            self.menu_tabel.insert('',END,values=[name,price,category])
-        #menu_tabel.insert('',END,values=["Masala Dosa","50"])
+    self.menuCategory.set("")
+    db = sqlite3.connect('../hotel_database.db')
+    cursor1 = db.cursor()
+    cursor2 = db.cursor()
+    cursor1.execute("select distinct category from menu;")
+    categories = cursor1.fetchall()
+    for category in categories:
+      cursor2.execute(f"select * from menu where category='{category[0]}';")
+      rows = cursor2.fetchall()
+      name = "\t\t"+str(category[0])
+      price = ""
+      self.menu_tabel.insert('',END,values=[name,price,category[0]])
+      for row in rows:
+        self.menu_tabel.insert('',END,values=row)
 
-  def load_item_from_menu(self):
-    return
+  def load_item_from_menu(self,event):
+    cursor_row = self.menu_tabel.focus()
+    contents = self.menu_tabel.item(cursor_row)
+    row = contents["values"]
+
+    self.itemName.set(str(row[0]))
+    self.itemRate.set(row[1])
+    self.itemCategory.set(row[2])
+    self.itemQuantity.set("1")
 
   def add_button_operation(self):
-    return
+    name = self.itemName.get()
+    rate = self.itemRate.get()
+    category = self.itemCategory.get()
+    quantity = self.itemQuantity.get()
+    if name=="":
+      return
+    if name in self.order_dict[category].keys():
+        tmsg.showinfo("Error", "Item already exist in your order")
+        return
+    if not quantity.isdigit():
+        tmsg.showinfo("Error", "Please Enter Valid Quantity")
+        return
+    lis = [name,rate,quantity,str(int(rate)*int(quantity)),category]
+    self.order_dict[category][name] = lis
+    self.load_order()
 
   def remove_button_operation(self):
-    return
+    name = self.itemName.get()
+    category = self.itemCategory.get()
+    if category=="":
+        return
+    if name not in self.order_dict[category].keys():
+        tmsg.showinfo("Error", "Item is not in your order list")
+        return
+    del self.order_dict[category][name]
+    self.load_order()
 
   def update_button_operation(self):
-    return
+    name = self.itemName.get()
+    rate = self.itemRate.get()
+    category = self.itemCategory.get()
+    quantity = self.itemQuantity.get()
+    if category=="":
+        return
+    if name not in self.order_dict[category].keys():
+        tmsg.showinfo("Error", "Item is not in your order list")
+        return
+    if self.order_dict[category][name][2]==quantity:
+        tmsg.showinfo("Error", "No changes in Quantity")
+        return
+    self.order_dict[category][name][2] = quantity
+    self.order_dict[category][name][3] = str(int(rate)*int(quantity))
+    self.load_order()
 
   def clear_button_operation(self):
-    return
+    self.itemName.set("")
+    self.itemRate.set("")
+    self.itemQuantity.set("")
+    self.itemCategory.set("")
 
-  def load_item_from_order(self):
-    return
+  def load_item_from_order(self,event):
+    cursor_row = self.order_tabel.focus()
+    contents = self.order_tabel.item(cursor_row)
+    row = contents["values"]
+    self.itemName.set(row[0])
+    self.itemRate.set(row[1])
+    self.itemQuantity.set(row[2])
+    self.itemCategory.set(row[4])
 
-  def bill_button_operation(self):
-    return
+  def load_order(self):
+    self.order_tabel.delete(*self.order_tabel.get_children())
+    for category in self.order_dict.keys():
+        if self.order_dict[category]:
+            for lis in self.order_dict[category].values():
+                self.order_tabel.insert('',END,values=lis)
+    self.update_total_price()
+
+  def update_total_price(self):
+    price = 0
+    for i in self.menu_category:
+        for j in self.order_dict[i].keys():
+            price += int(self.order_dict[i][j][3])
+    if price == 0:
+        self.totalPrice.set("")
+    else:
+        self.totalPrice.set("Rs. "+str(price)+"  /-")
+
+  def place_order_button_operation(self):
+    names = []
+    for i in self.menu_category:
+        names.extend(list(self.order_dict[i].keys()))
+    if len(names)==0:
+        tmsg.showinfo("Error", "Your order list is Empty")
+        return
+    ans = tmsg.askquestion("Generate Bill", "Are You Sure to Generate Bill?")
+    ans = "yes"
+    if ans=="yes":
+      x = datetime.datetime.now()
+      order_no = str(str(self.customerEmail) + ';' + x.strftime("%d") + '/' +
+                  x.strftime("%m") + '/' + x.strftime("%Y") + ';' +
+                  x.strftime("%H") + ':' + x.strftime("%M") + ':' + x.strftime("%S"))
+      db = sqlite3.connect('../hotel_database.db')
+      cursor = db.cursor()
+      date_time_cursor = db.cursor()
+      date_time_cursor.execute("SELECT datetime('now');")
+      date,time = date_time_cursor.fetchall()[0][0].split(' ')
+      cursor.execute(f"insert into orders values('{order_no}','{date}','{time}','{self.customerEmail}');")
+      db.commit()
+      db = sqlite3.connect('../hotel_database.db')
+      items_cursor = db.cursor()
+      for i in self.menu_category:
+        for j in self.order_dict[i].keys():
+          lis = self.order_dict[i][j]
+          name = lis[0]
+          rate = int(lis[1])
+          quantity = int(lis[2])
+          items_cursor.execute(f"insert into items values('{name}',{rate},{quantity},'{order_no}','Not Completed')")
+          db.commit()
+      tmsg.showinfo("Successful", "Your order has been placed")
 
   def cancel_button_operation(self):
     return
@@ -290,9 +393,9 @@ class Customer_page(Tk):
     self.destroy()
     self = Login.Login_page()
     
-'''
+
 # For Test
 if __name__=="__main__":
-  root = Customer_page('username','pass')
+  root = Customer_page('username')
   root.mainloop()
-  '''
+  

@@ -3,6 +3,7 @@ from tkinter import ttk
 from tkinter import messagebox
 import Login
 import re
+import sqlite3
 
 regex = '^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$'
 
@@ -132,7 +133,6 @@ class SignUp_page(Tk):
         else: 
             flag = 0
             return False 
-            break
       
     if flag ==-1: 
         return True
@@ -153,7 +153,13 @@ class SignUp_page(Tk):
     elif self.password.get()!=self.confirm_password.get():
       messagebox.showerror("confirm_password","Password and Confirm Password fields should match!")
       return True
-    return False
+    else:
+      db = sqlite3.connect('../hotel_database.db')
+      cursor = db.cursor()
+      cursor.execute(f"insert into Customer values('{self.emailId.get()}','{self.name.get()}','{self.phoneNo.get()}','{self.password.get()}');")
+      # cursor.execute("delete from Customer;")
+      db.commit()
+      return False
 
   def register(self):
     # print(self.name.get(),self.phoneNo.get(),self.emailId.get(),self.password.get())

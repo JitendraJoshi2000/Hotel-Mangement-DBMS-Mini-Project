@@ -2,19 +2,29 @@ from tkinter import *
 from tkinter import ttk
 import Login
 import os
+import sqlite3
+import tkinter.messagebox as tmsg
+import datetime
 
 class Waiter_page(Tk):
-  def __init__(self,emailId,password):
+  def __init__(self,emailId):
     super().__init__()
     self.geometry("%dx%d+0+0" % (self.winfo_screenwidth(), self.winfo_screenheight()))
-    self.title(f"Maharaja Hotel, Waiter {emailId}, {password}")
+    self.title(f"Maharaja Hotel, Waiter {emailId}")
     self.wm_iconbitmap("Burger.ico")
 
     style_button = ttk.Style()
     style_button.configure("TButton",font = ("arial",10,"bold"),background="lightgreen")
   
-    self.customerEmail = emailId
-    self.customerpassword = password
+    db = sqlite3.connect('../hotel_database.db')
+    cursor = db.cursor()
+    cursor.execute("select distinct category from Menu;")
+    menu_categories = cursor.fetchall()
+    self.menu_category = []
+    for i in menu_categories:
+      self.menu_category.append(str(i[0]))
+
+    self.order_no = ''
 
     #================Title==============
     title_frame = Frame(self, bd=8, bg="yellow", relief=GROOVE)
@@ -44,31 +54,35 @@ class Waiter_page(Tk):
                         font=("arial", 15, "bold"),bg = "lightblue", fg="blue")
     table_no_lable.grid(row = 0, column = 0)
 
-    customerTable = IntVar()
-    customerTable.set(0)
+    self.customerTable = IntVar()
+    self.customerTable.set(0)
     table_no_entry = Entry(customer_frame,width=5,font="arial 15",bd=5,state=DISABLED,
-                                    textvariable=customerTable)
+                                    textvariable=self.customerTable)
     table_no_entry.grid(row = 0, column=1,padx=(10,100))
     
     customer_name_label = Label(customer_frame, text="Name", 
                         font=("arial", 15, "bold"),bg = "lightblue", fg="blue")
     customer_name_label.grid(row = 0, column = 2)
 
-    customerName = StringVar()
-    customerName.set("")
+    self.customerName = StringVar()
+    self.customerName.set("")
     customer_name_entry = Entry(customer_frame,width=20,font="arial 15",bd=5,
-                                    textvariable=customerName)
+                                    textvariable=self.customerName)
     customer_name_entry.grid(row = 0, column=3,padx=(10,100))
 
     customer_email_label = Label(customer_frame, text="Email", 
                         font=("arial", 15, "bold"),bg = "lightblue", fg="blue")
     customer_email_label.grid(row = 0, column = 4)
 
-    customerEmail = StringVar()
-    customerEmail.set("")
+    self.customerEmail = StringVar()
+    self.customerEmail.set("")
     customer_email_entry = Entry(customer_frame,width=20,font="arial 15",bd=5,
-                                    textvariable=customerEmail)
+                                    textvariable=self.customerEmail)
     customer_email_entry.grid(row = 0, column=5,padx=(10,100))
+
+    add_customer_button = ttk.Button(customer_frame, text="Add Customer"
+                            ,command=self.add_customer_button_operation)
+    add_customer_button.grid(row = 0, column=6,padx=(10,100))
         
     #=============== Table Frame ===============
     ############################# Table Table ##########################################
@@ -92,15 +106,9 @@ class Waiter_page(Tk):
     scrollbar_menu_y.configure(command=self.tables_table.yview)
     
     self.tables_table.pack(fill=BOTH,expand=1)
-    
-    self.tables_table.insert('',END,values=["Table 1"])
-    self.tables_table.insert('',END,values=["Table 2"])
-    self.tables_table.insert('',END,values=["Table 3"])
-    self.tables_table.insert('',END,values=["Table 4"])
-    self.tables_table.insert('',END,values=["Table 5"])
 
-    self.load_tabels()
     self.tables_table.bind("<ButtonRelease-1>",self.load_table)
+    self.load_tables()
     
     ###########################################################################################
     
@@ -121,17 +129,11 @@ class Waiter_page(Tk):
     combo_lable.grid(row=0,column=0,padx=10)
     
     self.menuCategory = StringVar()
-    menu_category = ["Tea & Coffee","Beverages","Fast Food","South Indian","Starters","Main Course","Dessert"]
-
-    menu_category_dict = {"Tea & Coffee":"1 Tea & Coffee.txt","Beverages":"2 Beverages.txt",
-                "Fast Food":"3 Fast Food.txt","South Indian":"4 South Indian.txt",
-                "Starters":"5 Starters.txt","Main Course":"6 Main Course.txt",
-                "Dessert":"7 Dessert.txt"}
 
     order_dict = {}
-    for i in menu_category:
+    for i in self.menu_category:
         order_dict[i] = {}
-    combo_menu = ttk.Combobox(menu_category_frame,values=menu_category,
+    combo_menu = ttk.Combobox(menu_category_frame,values=self.menu_category,
                                 textvariable=self.menuCategory)
     combo_menu.grid(row=0,column=1,padx=30)
     
@@ -194,30 +196,30 @@ class Waiter_page(Tk):
                         font=("arial", 12, "bold"),bg = "lightgreen", fg="blue")
     item_name_label.grid(row=0,column=0,padx=(30,10))
     
-    itemCategory = StringVar()
-    itemCategory.set("")
+    self.itemCategory = StringVar()
+    self.itemCategory.set("")
     
-    itemName = StringVar()
-    itemName.set("")
-    item_name = Entry(item_frame2, font="arial 12",textvariable=itemName,state=DISABLED, width=25)
+    self.itemName = StringVar()
+    self.itemName.set("")
+    item_name = Entry(item_frame2, font="arial 12",textvariable=self.itemName,state=DISABLED, width=25)
     item_name.grid(row=0,column=1,padx=(0,10))
     
     item_rate_label = Label(item_frame2, text="Rate", 
                         font=("arial", 12, "bold"),bg = "lightgreen", fg="blue")
     item_rate_label.grid(row=0,column=2,padx=(25,10))
     
-    itemRate = StringVar()
-    itemRate.set("")
-    item_rate = Entry(item_frame2, font="arial 12",textvariable=itemRate,state=DISABLED, width=10)
+    self.itemRate = StringVar()
+    self.itemRate.set("")
+    item_rate = Entry(item_frame2, font="arial 12",textvariable=self.itemRate,state=DISABLED, width=10)
     item_rate.grid(row=0,column=3,padx=0)
     
     item_quantity_label = Label(item_frame2, text="Quantity", 
                         font=("arial", 12, "bold"),bg = "lightgreen", fg="blue")
     item_quantity_label.grid(row=1,column=0,padx=(30,0),pady=15)
     
-    itemQuantity = StringVar()
-    itemQuantity.set("")
-    item_quantity = Entry(item_frame2, font="arial 12",textvariable=itemQuantity, width=10)
+    self.itemQuantity = StringVar()
+    self.itemQuantity.set("")
+    item_quantity = Entry(item_frame2, font="arial 12",textvariable=self.itemQuantity, width=10)
     item_quantity.grid(row=1,column=1,padx=0)
     
     item_frame3 = Frame(item_frame, bg="lightgreen")
@@ -248,46 +250,46 @@ class Waiter_page(Tk):
     order_title_label.pack(side=TOP,fill="x")
     
     ############################## Order Tabel ###################################
-    order_tabel_frame = Frame(order_frame, bd=2, relief=SUNKEN)
-    order_tabel_frame.pack(fill='x')
+    order_table_frame = Frame(order_frame, bd=2, relief=SUNKEN)
+    order_table_frame.pack(fill='x')
     
-    scrollbar_order_x = Scrollbar(order_tabel_frame,orient=HORIZONTAL)
-    scrollbar_order_y = Scrollbar(order_tabel_frame,orient=VERTICAL)
+    scrollbar_order_x = Scrollbar(order_table_frame,orient=HORIZONTAL)
+    scrollbar_order_y = Scrollbar(order_table_frame,orient=VERTICAL)
     
-    order_tabel = ttk.Treeview(order_tabel_frame,height=8,
+    self.order_table = ttk.Treeview(order_table_frame,height=8,
                 columns =("name","rate","quantity","price","category"),xscrollcommand=scrollbar_order_x.set,
                 yscrollcommand=scrollbar_order_y.set)
     
-    order_tabel.heading("name",text="Name")
-    order_tabel.heading("rate",text="Rate")
-    order_tabel.heading("quantity",text="Quantity")
-    order_tabel.heading("price",text="Price")
-    order_tabel["displaycolumns"]=("name", "rate","quantity","price")
-    order_tabel["show"] = "headings"
-    order_tabel.column("rate",width=100,anchor='center', stretch=NO)
-    order_tabel.column("quantity",width=100,anchor='center', stretch=NO)
-    order_tabel.column("price",width=100,anchor='center', stretch=NO)
+    self.order_table.heading("name",text="Name")
+    self.order_table.heading("rate",text="Rate")
+    self.order_table.heading("quantity",text="Quantity")
+    self.order_table.heading("price",text="Price")
+    self.order_table["displaycolumns"]=("name", "rate","quantity","price")
+    self.order_table["show"] = "headings"
+    self.order_table.column("rate",width=100,anchor='center', stretch=NO)
+    self.order_table.column("quantity",width=100,anchor='center', stretch=NO)
+    self.order_table.column("price",width=100,anchor='center', stretch=NO)
     
-    order_tabel.bind("<ButtonRelease-1>",self.load_item_from_order)
+    self.order_table.bind("<ButtonRelease-1>",self.load_item_from_order)
     
     scrollbar_order_x.pack(side=BOTTOM,fill=X)
     scrollbar_order_y.pack(side=RIGHT,fill=Y)
     
-    scrollbar_order_x.configure(command=order_tabel.xview)
-    scrollbar_order_y.configure(command=order_tabel.yview)
+    scrollbar_order_x.configure(command=self.order_table.xview)
+    scrollbar_order_y.configure(command=self.order_table.yview)
     
-    order_tabel.pack(fill=BOTH,expand=1)
+    self.order_table.pack(fill=BOTH,expand=1)
     
-    # order_tabel.insert('',END,text="HEllo",values=["Masala Dosa","50","2","100"])
+    # order_table.insert('',END,text="HEllo",values=["Masala Dosa","50","2","100"])
     ###########################################################################################
     
     total_price_label = Label(order_frame, text="Total Price", 
                         font=("arial", 12, "bold"),bg = "lightgreen", fg="blue")
     total_price_label.pack(side='left',anchor=N,padx=(20,5),pady=20)
     
-    totalPrice = StringVar()
-    totalPrice.set("")
-    total_price_entry = Entry(order_frame, font="arial 12",textvariable=totalPrice,state=DISABLED, 
+    self.totalPrice = StringVar()
+    self.totalPrice.set("")
+    total_price_entry = Entry(order_frame, font="arial 12",textvariable=self.totalPrice,state=DISABLED, 
                                 width=10)
     total_price_entry.pack(side='left',anchor=N,padx=0,pady=20)
     
@@ -302,53 +304,125 @@ class Waiter_page(Tk):
         
 
   def show_button_operation(self):
-    return
+    category = self.menuCategory.get()
+    if category not in self.menu_category:
+        tmsg.showinfo("Error", "Please select valid Choice")
+    else:
+      self.menu_tabel.delete(*self.menu_tabel.get_children())
+      db = sqlite3.connect('../hotel_database.db')
+      cursor = db.cursor()
+      cursor.execute(f"select * from menu where category='{category}';")
+      rows = cursor.fetchall()
+      for row in rows:
+        self.menu_tabel.insert('',END,values=row)
     
   def load_menu(self):
-    return
-    '''self.menuCategory.set("")
     self.menu_tabel.delete(*self.menu_tabel.get_children())
-    menu_file_list = os.listdir("Menu")
-    for file in menu_file_list:
-        f = open("Menu\\" + file , "r")
-        category=""
-        while True:
-            line = f.readline()
-            if(line==""):
-                self.menu_tabel.insert('',END,values=["","",""])
-                break
-            elif (line=="\n"):
-                continue
-            elif(line[0]=='#'):
-                category = line[1:-1]
-                name = "\t\t"+line[:-1]
-                price = ""
-            elif(line[0]=='*'):
-                name = line[:-1]
-                price = ""
-            else:
-                name = line[:line.rfind(" ")]
-                price = line[line.rfind(" ")+1:-3]
-            
-            self.menu_tabel.insert('',END,values=[name,price,category])'''
+    self.menuCategory.set("")
+    db = sqlite3.connect('../hotel_database.db')
+    cursor1 = db.cursor()
+    cursor2 = db.cursor()
+    cursor1.execute("select distinct category from menu;")
+    categories = cursor1.fetchall()
+    for category in categories:
+      cursor2.execute(f"select * from menu where category='{category[0]}';")
+      rows = cursor2.fetchall()
+      name = "\t\t"+str(category[0])
+      price = ""
+      self.menu_tabel.insert('',END,values=[name,price,category[0]])
+      for row in rows:
+        self.menu_tabel.insert('',END,values=row)
 
-  def load_item_from_menu(self):
-    return
+  def load_item_from_menu(self,event):
+    cursor_row = self.menu_tabel.focus()
+    contents = self.menu_tabel.item(cursor_row)
+    row = contents["values"]
+
+    self.itemName.set(str(row[0]))
+    self.itemRate.set(row[1])
+    self.itemCategory.set(row[2])
+    self.itemQuantity.set("1")
 
   def add_button_operation(self):
-    return
+    name = self.itemName.get()
+    rate = self.itemRate.get()
+    category = self.itemCategory.get()
+    quantity = self.itemQuantity.get()
+    # table_no = self.customerTable.get()
+    if name=="":
+      return
+    if self.order_no == "":
+      tmsg.showinfo("Error", "No Customer Associated")
+      return
+    db = sqlite3.connect('../hotel_database.db')
+    cursor = db.cursor()
+    cursor.execute(f"select * from waiter_Items where order_no='{self.order_no}' AND name='{name}'")
+    rows = cursor.fetchall()
+    if len(rows)>0:
+      tmsg.showinfo("Error", "Item already exist in your order")
+      return
+    if not quantity.isdigit():
+        tmsg.showinfo("Error", "Please Enter Valid Quantity")
+        return
+    cursor2 = db.cursor()
+    cursor2.execute(f"insert into waiter_Items values('{name}',{rate},{quantity},'{self.order_no}','Not Completed','{category}')")
+    db.commit()
+    self.load_order()
 
   def remove_button_operation(self):
-    return
+    name = self.itemName.get()
+    if name=="":
+      return
+    if self.order_no == "":
+      tmsg.showinfo("Error", "No Customer Associated")
+      return
+    db = sqlite3.connect('../hotel_database.db')
+    cursor = db.cursor()
+    cursor.execute(f"select * from waiter_Items where order_no='{self.order_no}' AND name='{name}'")
+    rows = cursor.fetchall()
+    if len(rows)==1:
+      cursor2 = db.cursor()
+      cursor2.execute(f"delete from waiter_Items where order_no='{self.order_no}' AND name='{name}'")
+      db.commit()
+      self.load_order()
+    else:
+      tmsg.showinfo("Error", "Item is not in your order list")
 
   def update_button_operation(self):
-    return
+    name = self.itemName.get()
+    quantity = self.itemQuantity.get()
+    if name=="":
+      return
+    if self.order_no == "":
+      tmsg.showinfo("Error", "No Customer Associated")
+      return
+    db = sqlite3.connect('../hotel_database.db')
+    cursor = db.cursor()
+    cursor.execute(f"select * from waiter_Items where order_no='{self.order_no}' AND name='{name}'")
+    rows = cursor.fetchall()
+    if len(rows)==1:
+      cursor2 = db.cursor()
+      cursor2.execute(f"update waiter_Items set quantity={quantity} where order_no='{self.order_no}' AND name='{name}'")
+      db.commit()
+      self.load_order()
+    else:
+      tmsg.showinfo("Error", "Item is not in your order list")
 
   def clear_button_operation(self):
-    return
+    self.itemName.set("")
+    self.itemRate.set("")
+    self.itemQuantity.set("")
+    self.itemCategory.set("")
 
-  def load_item_from_order(self):
-    return
+  def load_item_from_order(self,event):
+    cursor_row = self.order_table.focus()
+    contents = self.order_table.item(cursor_row)
+    row = contents["values"]
+    # ("name","rate","quantity","price","category")
+    self.itemName.set(row[0])
+    self.itemRate.set(row[1])
+    self.itemCategory.set(row[4])
+    self.itemQuantity.set(row[2])
 
   def bill_button_operation(self):
     return
@@ -360,15 +434,97 @@ class Waiter_page(Tk):
     self.destroy()
     self = Login.Login_page()
 
-  def load_tabels(self):
-    return
+  def load_tables(self):
+    for i in range(1,11):
+      self.tables_table.insert('',END,values=[f"Table {i}"])
 
-  def load_table(self):
-    pass
+  def load_table(self,event):
+    cursor_row = self.tables_table.focus()
+    contents = self.tables_table.item(cursor_row)
+    row = contents["values"]
+    table_no = int(row[0].split(' ')[1])
+    self.customerTable.set(table_no)
+    db = sqlite3.connect('../hotel_database.db')
+    cursor = db.cursor()
+    cursor.execute(f"select * from waiter_order where table_no='{table_no}'")
+    rows = cursor.fetchall()
+    # print(rows)
+    # print(len(rows)==1)
+    if len(rows)==1:
+      name = rows[0][4]
+      email = rows[0][5]
+      self.customerName.set(name)
+      self.customerEmail.set(email)
+      # print("before ",self.order_no)
+      self.order_no = rows[0][0]
+      # print("after ",self.order_no)
+
+      self.load_order()
+    else:
+      self.customerName.set("")
+      self.customerEmail.set("")
+      self.order_no = ""
+      self.order_table.delete(*self.order_table.get_children())
+    # self.customerName.set("demo")
+    # self.customerEmail.set("demo")
+    self.load_menu()
+
+  def add_customer_button_operation(self):
+    if self.customerName.get()=='' or self.customerEmail.get()=='':
+      tmsg.showinfo("Error", "No Empty fields allowed")
+      return
+    cursor_row = self.tables_table.focus()
+    contents = self.tables_table.item(cursor_row)
+    row = contents["values"]
+    table_no = int(row[0].split(' ')[1])
+    # print(table_no)
+    db = sqlite3.connect('../hotel_database.db')
+    cursor1 = db.cursor()
+    cursor1.execute(f"select * from waiter_order where table_no='{table_no}'")
+    rows = cursor1.fetchall()
+    # print(rows)
+    # print(len(rows))
+    if len(rows)>=1:
+      tmsg.showinfo("Error", "Customer is already associated with this table")
+      return
+    x = datetime.datetime.now()
+    self.order_no = str(self.customerEmail.get() + ';Table' + str(self.customerTable.get())
+                        + ';' + x.strftime("%d") + '/' +
+                  x.strftime("%m") + '/' + x.strftime("%Y") + ';' +
+                  x.strftime("%H") + ':' + x.strftime("%M") + ':' + x.strftime("%S"))
+    # print(self.order_no)
+    cursor = db.cursor()
+    date_time_cursor = db.cursor()
+    date_time_cursor.execute("SELECT datetime('now');")
+    date,time = date_time_cursor.fetchall()[0][0].split(' ')
+    cursor.execute(f"insert into waiter_order values('{self.order_no}',{self.customerTable.get()},'{date}','{time}','{self.customerName.get()}','{self.customerEmail.get()}');")
+    db.commit()
+    tmsg.showinfo("Successful", "Customer Added")
+
+  def load_order(self):
+    # print("load order called")
+    # print(self.order_no)
+    self.order_table.delete(*self.order_table.get_children())
+    db = sqlite3.connect('../hotel_database.db')
+    total_price = 0
+    for category in self.menu_category:
+      cursor = db.cursor()
+      cursor.execute(f"select * from waiter_Items where order_no='{self.order_no}' AND category='{category}';")
+      rows = cursor.fetchall()
+      for row in rows:
+        name = row[0]
+        rate = row[1]
+        quantity = row[2]
+        price = rate * quantity
+        total_price += price
+        category = row[5]
+        lis = [name,rate,quantity,price,category]
+        self.order_table.insert('',END,values=lis)
+    self.totalPrice.set(str(total_price))
     
 
 # For Test
 if __name__=="__main__":
-  root = Waiter_page('username','pass')
+  root = Waiter_page('Demo Waiter')
   root.mainloop()
   

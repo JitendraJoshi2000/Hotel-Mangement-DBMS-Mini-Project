@@ -4,6 +4,7 @@ from tkinter import messagebox
 import SignUp
 import Customer
 import re
+import sqlite3
 
 regex = '^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$'
 
@@ -122,21 +123,36 @@ class Login_page(Tk):
     elif self.check_password(self.password.get()):
       messagebox.showerror("password","Password field should contain atleast one lowercase letter,uppercase letter,digit and one special charater!")
       return True
-    return False
+    else:
+      db = sqlite3.connect('../hotel_database.db')
+      cursor = db.cursor()
+      cursor.execute(f"select email_id,password from Customer;")
+      rows = cursor.fetchall()
+      flag = 1
+      for row in rows:
+        if self.username.get() == row[0]:
+          if self.password.get() == row[1]:
+            flag = 0
+          else:
+            messagebox.showerror("Password","Enter correct password!")
+            return True
+      if flag == 1:
+        messagebox.showerror("Login","Account Not Exist, Register first!")
+        return True
+      else:  
+        return flag
     
   def login(self):
     # print(self.username.get(),self.password.get())
     if self.check_fields():
       return
-    username = self.username.get()
-    password = self.password.get()
     self.destroy()
-    self = Customer.Customer_page(username,password)
+    self = Customer.Customer_page(self.username.get())
     
     
-'''
+
 # For Test
 if __name__=="__main__":
   root = Login_page()
   root.mainloop()
-  '''
+  

@@ -67,16 +67,18 @@ class Login_page(Tk):
     elif username=='chef' and password=='chef':
       self.destroy()
       self = Chef.Chef_page()
-    else:
+    elif username=='waiter' and password=='waiter':
       # Get Data from database
       self.destroy()
-      self = Waiter.Waiter_page(username,password)
+      self = Waiter.Waiter_page(username)
       #s = Customer.Customer_page(username,password)
+    else:
+      tmsg.showinfo("Error", "Wrong Username or password")
     
     
-
+'''
 # For Test
 if __name__=="__main__":
   root = Login_page()
   root.mainloop()
-  
+  '''

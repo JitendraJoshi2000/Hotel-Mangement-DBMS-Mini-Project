@@ -382,20 +382,26 @@ class Customer_page(Tk):
           name = lis[0]
           rate = int(lis[1])
           quantity = int(lis[2])
-          items_cursor.execute(f"insert into items values('{name}',{rate},{quantity},'{order_no}','Not Completed')")
+          category = lis[4]
+          items_cursor.execute(f"insert into items values('{name}',{rate},{quantity},'{order_no}','Not Completed','{category}')")
           db.commit()
       tmsg.showinfo("Successful", "Your order has been placed")
+      self.logout_operation()
 
   def cancel_button_operation(self):
-    return
+    ans = tmsg.askquestion("Generate Bill", "Are You Sure to Cancel Order?")
+    if ans=="yes":
+      for i in self.order_dict.keys():
+        del self.order_dict[i]
+      self.load_order()
   
   def logout_operation(self):
     self.destroy()
     self = Login.Login_page()
     
-
+'''
 # For Test
 if __name__=="__main__":
-  root = Customer_page('username')
+  root = Customer_page('Demo_Customer')
   root.mainloop()
-  
+'''

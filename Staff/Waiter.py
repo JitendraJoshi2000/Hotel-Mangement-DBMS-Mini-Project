@@ -423,18 +423,13 @@ class Waiter_page(Tk):
     self.itemRate.set(row[1])
     self.itemCategory.set(row[4])
     self.itemQuantity.set(row[2])
-
-  def bill_button_operation(self):
-    return
-
-  def cancel_button_operation(self):
-    return
   
   def logout_operation(self):
     self.destroy()
     self = Login.Login_page()
 
   def load_tables(self):
+    self.tables_table.delete(*self.tables_table.get_children())
     for i in range(1,11):
       self.tables_table.insert('',END,values=[f"Table {i}"])
 
@@ -488,10 +483,7 @@ class Waiter_page(Tk):
       tmsg.showinfo("Error", "Customer is already associated with this table")
       return
     x = datetime.datetime.now()
-    self.order_no = str(self.customerEmail.get() + ';Table' + str(self.customerTable.get())
-                        + ';' + x.strftime("%d") + '/' +
-                  x.strftime("%m") + '/' + x.strftime("%Y") + ';' +
-                  x.strftime("%H") + ':' + x.strftime("%M") + ':' + x.strftime("%S"))
+    self.order_no = str(self.customerEmail.get() + ';Table' + str(self.customerTable.get()) + ';' + x.strftime("%d") + '/' + x.strftime("%m") + '/' + x.strftime("%Y") + ';' + x.strftime("%H") + ':' + x.strftime("%M") + ':' + x.strftime("%S"))
     # print(self.order_no)
     cursor = db.cursor()
     date_time_cursor = db.cursor()
@@ -521,10 +513,76 @@ class Waiter_page(Tk):
         lis = [name,rate,quantity,price,category]
         self.order_table.insert('',END,values=lis)
     self.totalPrice.set(str(total_price))
-    
+  
+  def bill_button_operation(self):
+    x = datetime.datetime.now()
+    db = sqlite3.connect('../hotel_database.db')
+    cursor = db.cursor()
+    cursor2 = db.cursor()
+    cursor3 = db.cursor()
+    cursor4 = db.cursor()
+    cursor2.execute(f"insert into Record_Order values('{self.order_no}');")
+    st = "\t\t\t\tMaharaja Hotel\n\t\t\tPimple Gurav, Pune-411061\n"
+    st += "\t\t\tGST.NO:- 27AHXPP3379HIZH\n"
+    st += "-"*61 + "BILL" + "-"*61 + "\nDate:- "
+    st += str(x.strftime("%d") + '/' + x.strftime("%m") + '/' + x.strftime("%Y") +' '+ x.strftime("%a"))
+    st += " "*10 + f"\t\t\t\t\t\tTime:- "
+    st += str(x.strftime("%H") + ':' + x.strftime("%M") + ':' + x.strftime("%S"))
+    st += f"\nCustomer Order No:- {self.order_no}\n"
+    st += "-"*130 + "\n" + " "*4 + "DESCRIPTION\t\t\t\t\tRATE\tQUANTITY\t\tAMOUNT\n"
+    st += "-"*130 + "\n"
+    cursor.execute(f"select name, rate, quantity, category from waiter_Items where order_no='{self.order_no}';")
+    rows = cursor.fetchall()
+    for row in rows:
+      name = row[0]
+      rate = row[1]
+      quantity = row[2]
+      price = rate * quantity
+      category = row[3]
+      cursor3.execute(f"insert into Record_Items values('{name}', {rate}, {quantity}, '{category}', '{self.order_no}');")
+      cursor4.execute(f"delete from waiter_Items where order_no='{self.order_no}' AND name='{name}'")
+      st += name + "\t\t\t\t\t" + str(rate) + "\t      " + str(quantity) + "\t\t  " + str(price) + "\n\n"
+    st += "-"*130
+    #Total Price
+    st += f"\n\t\t\tTotal price : {self.totalPrice.get()}\n"
+    st += "-"*130
+    #write into file
+    folder = str(x.strftime("%d") + ',' + x.strftime("%m") + ',' + x.strftime("%Y"))
+    if not os.path.exists(f"Bill Records\\{folder}"):
+      os.makedirs(f"Bill Records\\{folder}")
+    lis = self.order_no.split(';')
+    date = str(x.strftime("%d") + ',' + x.strftime("%m") + ',' + x.strftime("%Y"))
+    time = str(x.strftime("%H") + ',' + x.strftime("%M") + ',' + x.strftime("%S"))
+    file = open(f"Bill Records\\{folder}\\{lis[0]}_{lis[1]}_{date}_{time}.txt", "w")
+    file.write(st)
+    file.close()
+    #display bill
+    bill = Toplevel()
+    bill.title("Bill")
+    bill.geometry("670x500+300+100")
+    # bill.wm_iconbitmap("Coffee.ico")
+    bill_text_area = Text(bill, font=("arial", 12))
+    bill_text_area.insert(1.0, st)
+    #delete order from database
+    cursor5 = db.cursor()
+    cursor5.execute(f"delete from waiter_order where order_no='{self.order_no}'")
+    db.commit()
+    self.customerEmail.set('')
+    self.customerName.set('')
+    self.customerTable.set(0)
+    self.load_tables()
+    self.load_order()
 
+    bill_text_area.pack(expand=True, fill=BOTH)
+    bill.focus_set()
+    bill.protocol("WM_DELETE_WINDOW", close_window)
+
+  def cancel_button_operation(self):
+    return
+    
+'''
 # For Test
 if __name__=="__main__":
   root = Waiter_page('Demo Waiter')
   root.mainloop()
-  
+'''

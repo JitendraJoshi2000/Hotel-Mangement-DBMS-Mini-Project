@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-e commit your changes or stash them before you mer
-=======
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
@@ -153,10 +150,9 @@ class Login_page(Tk):
     self = Customer.Customer_page(self.username.get())
     
     
-
+'''
 # For Test
 if __name__=="__main__":
   root = Login_page()
   root.mainloop()
-  
->>>>>>> 8455f1549dc6b7da39a503e0d40b50bce2737d20
+'''  

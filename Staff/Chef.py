@@ -1,6 +1,10 @@
 from tkinter import *
 from tkinter import ttk
 import Login
+import sqlite3
+import tkinter.messagebox as tmsg
+import datetime
+import os
 
 class Chef_page(Tk):
   def __init__(self):
@@ -48,9 +52,9 @@ class Chef_page(Tk):
     order_category_frame = Frame(order_frame,bg="lightgreen",pady=5)
     order_category_frame.pack(fill="x")
 
-    orderCategory = StringVar()
+    self.orderCategory = StringVar()
     combo_order = ttk.Combobox(order_category_frame,values=["Tabel","Parcel"],
-                                textvariable=orderCategory)
+                                textvariable=self.orderCategory)
     combo_order.grid(row=0,column=0,padx=5,pady=5)
 
     show_button = ttk.Button(order_category_frame, text="Show",
@@ -71,25 +75,23 @@ class Chef_page(Tk):
     style.configure("Treeview.Heading",font=("arial",13, "bold"))
     style.configure("Treeview",font=("arial",12),rowheight=25)
 
-    order_tabel = ttk.Treeview(order_tabel_frame,style = "Treeview",
-                columns =("name"),
+    self.order_tabel = ttk.Treeview(order_tabel_frame,style = "Treeview",
+                columns =("name","order_no"),
                 yscrollcommand=scrollbar_order_y.set)
 
-    order_tabel.heading("name",text="Order Name")
-    order_tabel["show"] = "headings"
-    order_tabel.column("name",anchor='center')
+    self.order_tabel.heading("name",text="Order Name")
+    self.order_tabel["show"] = "headings"
+    self.order_tabel.column("name",anchor='center')
+    self.order_tabel["displaycolumns"]=("name")
 
     scrollbar_order_y.pack(side=RIGHT,fill=Y)
-    scrollbar_order_y.configure(command=order_tabel.yview)
+    scrollbar_order_y.configure(command=self.order_tabel.yview)
 
-    order_tabel.pack(fill=BOTH,expand=1)
+    self.order_tabel.pack(fill=BOTH,expand=1)
 
-    order_tabel.insert('',END,values=["Tabel 1"])
-    order_tabel.insert('',END,values=["Tabel 2"])
-    order_tabel.insert('',END,values=["Order 101"])
-    order_tabel.insert('',END,values=["Order 102"])
-    #self.order_show_all() # To load tabel initially
-    order_tabel.bind("<ButtonRelease-1>",self.load_item_from_order)
+    
+    self.order_show_all() # To load tabel initially
+    self.order_tabel.bind("<ButtonRelease-1>",self.load_item_from_order)
 
     ###########################################################################################
     
@@ -102,7 +104,7 @@ class Chef_page(Tk):
     items_title_frame.pack(side=TOP, fill="x", pady=5)
 
     show_all_button = ttk.Button(items_title_frame, text="Show All",
-                            command=self.item_show_operation)
+                            command=self.items_show_all)
     show_all_button.pack(side='right',padx=10,pady=10)
 
     Items_label = Label(items_title_frame, text="Items", 
@@ -120,35 +122,28 @@ class Chef_page(Tk):
     style.configure("Treeview.Heading",font=("arial",13, "bold"))
     style.configure("Treeview",font=("arial",12),rowheight=25)
 
-    items_tabel = ttk.Treeview(items_tabel_frame,style = "Treeview",
-                columns =("name","quantity","status"),xscrollcommand=scrollbar_items_x.set,
+    self.items_tabel = ttk.Treeview(items_tabel_frame,style = "Treeview",
+                columns =("name","quantity","status","order_no"),xscrollcommand=scrollbar_items_x.set,
                 yscrollcommand=scrollbar_items_y.set)
 
-    items_tabel.heading("name",text="Name")
-    items_tabel.heading("quantity",text="Quantity")
-    items_tabel.heading("status",text="Status")
-    items_tabel["displaycolumns"]=("name","quantity","status")
-    items_tabel["show"] = "headings"
-    items_tabel.column("name",width=300)
-    items_tabel.column("quantity",width=100,anchor='center')
+    self.items_tabel.heading("name",text="Name")
+    self.items_tabel.heading("quantity",text="Quantity")
+    self.items_tabel.heading("status",text="Status")
+    self.items_tabel["displaycolumns"]=("name","quantity","status")
+    self.items_tabel["show"] = "headings"
+    self.items_tabel.column("name",width=300)
+    self.items_tabel.column("quantity",width=100,anchor='center')
 
     scrollbar_items_x.pack(side=BOTTOM,fill=X)
     scrollbar_items_y.pack(side=RIGHT,fill=Y)
 
-    scrollbar_items_x.configure(command=items_tabel.xview)
-    scrollbar_items_y.configure(command=items_tabel.yview)
+    scrollbar_items_x.configure(command=self.items_tabel.xview)
+    scrollbar_items_y.configure(command=self.items_tabel.yview)
 
-    items_tabel.pack(fill=BOTH,expand=1)
-
-
-    items_tabel.insert('',END,values=["Masala Dosa",2,"Not Completed"])
-    items_tabel.insert('',END,values=["Tea",1,"Completed"])
-    items_tabel.insert('',END,values=["Coffee",3,"Not Completed"])
-    items_tabel.insert('',END,values=["Roti",1,"Completed"])
-    items_tabel.insert('',END,values=["Sandwitch",2,"Completed"])
+    self.items_tabel.pack(fill=BOTH,expand=1)
 
     self.items_show_all()
-    items_tabel.bind("<ButtonRelease-1>",self.load_item_into_from_items)
+    self.items_tabel.bind("<ButtonRelease-1>",self.load_item_into_from_items)
     
     ###########################################################################################
 
@@ -163,9 +158,9 @@ class Chef_page(Tk):
                     font=("times new roman", 20, "bold"),bg = "lightgreen", fg="red")
     selected_item_lable.grid(row=0,column=0,padx=10)
 
-    itemName = StringVar()
-    itemName.set("Masala Dosa")
-    item_name = Entry(selected_item_frame, font="arial 12",textvariable=itemName,state=DISABLED, width=20)
+    self.itemName = StringVar()
+    self.itemName.set('')
+    item_name = Entry(selected_item_frame, font="arial 12",textvariable=self.itemName,state=DISABLED, width=20)
     item_name.grid(row=0,column=1,padx=10)
 
     item_complete_button = ttk.Button(item_frame, text="Mark Completed",
@@ -179,42 +174,215 @@ class Chef_page(Tk):
                     font=("times new roman", 20, "bold"),bg = "lightgreen", fg="red")
     selected_order_lable.grid(row=0,column=0,padx=10)
 
-    orderName = StringVar()
-    orderName.set("Table 1")
-    order_name = Entry(selected_order_frame, font="arial 12",textvariable=orderName,state=DISABLED, width=20)
+    self.orderName = StringVar()
+    self.orderName.set('')
+    order_name = Entry(selected_order_frame, font="arial 12",textvariable=self.orderName,state=DISABLED, width=20)
     order_name.grid(row=0,column=1,padx=10)
 
     order_complete_button = ttk.Button(item_frame, text="Order Completed",
                             command=self.order_complete_button_operation)
     order_complete_button.pack(padx=10,pady=10)
-    
+
+#=========================Frontend Ends here
+
   def logout_operation(self):
     self.destroy()
     self = Login.Login_page()
 
   def order_show_operation(self):
-    pass
+    if self.orderCategory.get() not in ["Tabel","Parcel"]:
+      tmsg.showinfo("Error", "Please select valid Choice")
+      return
+    if self.orderCategory.get()=="Tabel":
+      self.order_tabel.delete(*self.order_tabel.get_children())
+      db = sqlite3.connect('../hotel_database.db')
+      cursor = db.cursor()
+      cursor.execute("select table_no from waiter_order;")
+      rows = cursor.fetchall()
+      tabels = []
+      for i in rows:
+        tabels.append(i[0])
+      tabels.sort()
+      for tabel in tabels:
+        self.order_tabel.insert('',END,values=[f"Tabel {tabel}"])
+    elif self.orderCategory.get()=="Parcel":
+      self.order_tabel.delete(*self.order_tabel.get_children())
+      db = sqlite3.connect('../hotel_database.db')
+      cursor = db.cursor()
+      cursor.execute("select cust_id,order_no from Orders ORDER BY date,time;")
+      rows = cursor.fetchall()
+      for row in rows:
+        self.order_tabel.insert('',END,values=[row[0],row[1]])
 
   def order_show_all(self):
-    pass
+    self.order_tabel.delete(*self.order_tabel.get_children())
+    db = sqlite3.connect('../hotel_database.db')
+    cursor = db.cursor()
+    cursor.execute("select table_no from waiter_order;")
+    rows = cursor.fetchall()
+    tabels = []
+    for i in rows:
+      tabels.append(i[0])
+    tabels.sort()
+    for tabel in tabels:
+      self.order_tabel.insert('',END,values=[f"Tabel {tabel}"])
+    cursor2 = db.cursor()
+    cursor2.execute("select cust_id,order_no from Orders ORDER BY date,time;")
+    rows = cursor2.fetchall()
+    for row in rows:
+      self.order_tabel.insert('',END,values=[row[0],row[1]])
 
-  def load_item_from_order(self,e):
-    pass
-
-  def item_show_operation(self):
-    pass
+  def load_item_from_order(self,event):
+    cursor_row = self.order_tabel.focus()
+    contents = self.order_tabel.item(cursor_row)
+    row = contents["values"]
+    self.items_tabel.delete(*self.items_tabel.get_children())
+    db = sqlite3.connect('../hotel_database.db')
+    if (row[0].split(' ')[0]=='Tabel'):
+      table_no = int(row[0].split(' ')[1])
+      self.itemName.set('')
+      self.orderName.set(f"Tabel {table_no}")
+      cursor = db.cursor()
+      cursor.execute(f"select order_no from waiter_order where table_no={table_no};")
+      rows = cursor.fetchall()
+      order_no = rows[0][0]
+      cursor2 = db.cursor()
+      cursor2.execute(f"select name,quantity,status,order_no from waiter_Items where order_no='{order_no}' AND status='Not Completed';")
+      rows = cursor2.fetchall()
+      for row in rows:
+        self.items_tabel.insert('',END,values=[row[0],row[1],row[2],row[3]])
+    else:
+      order_no = row[1]
+      self.itemName.set('')
+      self.orderName.set(order_no)
+      cursor = db.cursor()
+      cursor.execute(f"select name,quantity,status,order_no from Items where order_no='{order_no}';")
+      rows = cursor.fetchall()
+      for row in rows:
+        self.items_tabel.insert('',END,values=[row[0],row[1],row[2],row[3]])
 
   def items_show_all(self):
-    pass
+    self.items_tabel.delete(*self.items_tabel.get_children())
+    db = sqlite3.connect('../hotel_database.db')
+    cursor = db.cursor()
+    cursor.execute(f"select name,quantity,status,waiter_Items.order_no from waiter_Items,waiter_order where waiter_order.order_no=waiter_Items.order_no AND status='Not Completed' order by waiter_order.table_no;")
+    rows = cursor.fetchall()
+    for row in rows:
+       self.items_tabel.insert('',END,values=[row[0],row[1],row[2],row[3]])
+    cursor2 = db.cursor()
+    cursor2.execute(f"select name,quantity,status,order_no from Items;")
+    rows = cursor2.fetchall()
+    for row in rows:
+       self.items_tabel.insert('',END,values=[row[0],row[1],row[2],row[3]])
 
-  def load_item_into_from_items(self,e):
-    pass
+  def load_item_into_from_items(self,event):
+    cursor_row = self.items_tabel.focus()
+    contents = self.items_tabel.item(cursor_row)
+    row = contents["values"]
+    self.itemName.set(row[0])
+    order_no = str(row[3])
+    if (order_no.count(';')==3):
+      db = sqlite3.connect('../hotel_database.db')
+      cursor = db.cursor()
+      cursor.execute(f"select table_no from waiter_order where order_no='{order_no}'")
+      rows = cursor.fetchall()
+      self.orderName.set(f"Tabel {rows[0][0]}")
+    else:
+      self.orderName.set(row[3])
 
   def item_complete_button_operation(self):
-    pass
+    item_name = self.itemName.get()
+    order_name = self.orderName.get()
+    if item_name=='' or order_name=='':
+      tmsg.showinfo("Error", "Please Select Item")
+      return
+    if (order_name.split(' ')[0]=='Tabel'):
+      tabel_no = int(order_name.split(' ')[1])
+      db = sqlite3.connect('../hotel_database.db')
+      cursor = db.cursor()
+      cursor.execute(f"select order_no from waiter_order where table_no={tabel_no}")
+      rows = cursor.fetchall()
+      order_no = rows[0][0]
+      cursor2 = db.cursor()
+      cursor2.execute(f"update waiter_Items SET status='Completed' where name='{item_name}' AND order_no='{order_no}'")
+      db.commit()
+    else:
+      db = sqlite3.connect('../hotel_database.db')
+      cursor = db.cursor()
+      cursor.execute(f"update Items SET status='Completed' where name='{item_name}' AND order_no='{order_name}'")
+      db.commit()
+    self.itemName.set('')
+    self.orderName.set('')
+    self.load_item_from_order('event')
 
   def order_complete_button_operation(self):
-    pass
+    order_name = self.orderName.get()
+    if order_name=='':
+      tmsg.showinfo("Error", "Please Select Order")
+      return
+    if (order_name.split(' ')[0]=='Tabel'):
+      tabel_no = int(order_name.split(' ')[1])
+      db = sqlite3.connect('../hotel_database.db')
+      cursor = db.cursor()
+      cursor.execute(f"select order_no from waiter_order where table_no={tabel_no}")
+      rows = cursor.fetchall()
+      order_no = rows[0][0]
+      cursor2 = db.cursor()
+      cursor2.execute(f"update waiter_Items SET status='Completed' where order_no='{order_no}'")
+      db.commit()
+    else:
+      order_no = self.orderName.get()
+      x = datetime.datetime.now()
+      db = sqlite3.connect('../hotel_database.db')
+      #save order in Record_Order table
+      cursor2 = db.cursor()
+      cursor2.execute(f"insert into Record_Order values('{order_no}');")
+      cursor = db.cursor()
+      cursor3 = db.cursor()
+      cursor4 = db.cursor()
+      date = str(x.strftime("%d") + ',' + x.strftime("%m") + ',' + x.strftime("%Y"))
+      time = str(x.strftime("%H") + ',' + x.strftime("%M") + ',' + x.strftime("%S"))
+      #Contents of menu
+      st = "\t\t\t\tMaharaja Hotel\n\t\t\tPimple Gurav, Pune-411061\n"
+      st += "\t\t\tGST.NO:- 27AHXPP3379HIZH\n"
+      st += "-"*61 + "BILL" + "-"*61 + "\nDate:- "
+      st += str(x.strftime("%d") + '/' + x.strftime("%m") + '/' + x.strftime("%Y") +' '+ x.strftime("%a"))
+      st += " "*10 + f"\t\t\t\t\t\tTime:- "
+      st += str(x.strftime("%H") + ':' + x.strftime("%M") + ':' + x.strftime("%S"))
+      st += f"\nCustomer Order No:- {order_no}\n"
+      st += "-"*130 + "\n" + " "*4 + "DESCRIPTION\t\t\t\t\tRATE\tQUANTITY\t\tAMOUNT\n"
+      st += "-"*130 + "\n"
+      cursor.execute(f"select name, rate, quantity, category from Items where order_no='{order_no}';")
+      rows = cursor.fetchall()
+      total_price = 0
+      for row in rows:
+        name = row[0]
+        rate = row[1]
+        quantity = row[2]
+        price = rate * quantity
+        total_price += price
+        category = row[3]
+        cursor3.execute(f"insert into Record_Items values('{name}', {rate}, {quantity}, '{category}', '{order_no}');")
+        cursor4.execute(f"delete from Items where order_no='{order_no}' AND name='{name}'")
+        st += name + "\t\t\t\t\t" + str(rate) + "\t      " + str(quantity) + "\t\t  " + str(price) + "\n\n"
+      st += "-"*130
+      #Total Price
+      st += f"\n\t\t\tTotal price : {total_price}\n"
+      st += "-"*130
+      #write into file
+      folder = str(x.strftime("%d") + ',' + x.strftime("%m") + ',' + x.strftime("%Y"))
+      if not os.path.exists(f"Bill Records\\{folder}"):
+        os.makedirs(f"Bill Records\\{folder}")
+      lis = order_no.split(';')
+      file = open(f"Bill Records\\{folder}\\{lis[0]}_{date}_{time}.txt", "w")
+      file.write(st)
+      file.close()
+      #delete order from database
+      cursor5 = db.cursor()
+      cursor5.execute(f"delete from Orders where order_no='{order_no}'")
+      db.commit()
+      self.items_tabel.delete(*self.items_tabel.get_children())
+      self.order_show_all()
 
   def change_menu_button_operation(self):
     pass
@@ -222,8 +390,9 @@ class Chef_page(Tk):
     
     
     
-    
+'''   
 # For Test
 if __name__=="__main__":
   root = Chef_page()
   root.mainloop()
+  '''

@@ -360,7 +360,7 @@ class Customer_page(Tk):
     if len(names)==0:
         tmsg.showinfo("Error", "Your order list is Empty")
         return
-    ans = tmsg.askquestion("Generate Bill", "Are You Sure to Generate Bill?")
+    ans = tmsg.askquestion("Place Order", "Are You Sure to Place Order?")
     ans = "yes"
     if ans=="yes":
       x = datetime.datetime.now()

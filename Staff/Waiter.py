@@ -572,6 +572,7 @@ class Waiter_page(Tk):
     self.customerTable.set(0)
     self.load_tables()
     self.load_order()
+    self.clear_button_operation()
 
     bill_text_area.pack(expand=True, fill=BOTH)
     bill.focus_set()

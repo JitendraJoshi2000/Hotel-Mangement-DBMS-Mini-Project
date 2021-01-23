@@ -1,14 +1,12 @@
 # Hotel-Mangement-DBMS-Mini-Project
-Our DBMS Mini Project
 
-This will be a Hotel management project that displays the menu of the hotel and takes orders from customers and generates bills. We have considered requirements for the hotel side and have considered 3 major users i.e Customer, Chef, and Waiter.
+This is Hotel(Restaurant) management project that displays the menu of the hotel and takes orders from customers and generates bills. We have considered requirements for the hotel side and have considered 3 major users i.e Customer, Chef, and Waiter.
 
-Front End: Python(tkinter)
+Frontend: Python(tkinter)
 
-Back End: Sqlite
+Database used: Sqlite
 
 Scope of Mini Project:-
-
 Scope of project is for managing orders received from customers using 3 Actors/Users in process.
 1: Customer side
 Project Scope for Customers is only place order for parcels.
@@ -22,6 +20,7 @@ Chef receives and completes orders.
 
 Waiter:
 Waiter can place orders for customers.
+
 
 
 

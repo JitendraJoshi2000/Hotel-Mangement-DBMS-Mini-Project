@@ -26,6 +26,7 @@ Waiter:
 Waiter can place orders for customers.
 
 
+
 <b>Screen Shots:-</b>
 
 Customer Login:

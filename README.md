@@ -26,6 +26,28 @@ Waiter:
 Waiter can place orders for customers.
 
 
+<b>Screen Shots:-</b>
+
+Customer Login:
+![Customer Login](https://github.com/JitendraJoshi2000/Hotel-Mangement-DBMS-Mini-Project/blob/main/Screenshots/customer%20login.png?raw=true)
+
+Customer Signup:
+![Customer Signup](https://github.com/JitendraJoshi2000/Hotel-Mangement-DBMS-Mini-Project/blob/main/Screenshots/customer%20signup.png?raw=true)
+
+Customer Main Page:
+![Customer Main Page](https://github.com/JitendraJoshi2000/Hotel-Mangement-DBMS-Mini-Project/blob/main/Screenshots/customer%20main%20page.png?raw=true)
+
+Staff Login:
+![Staff Login](https://github.com/JitendraJoshi2000/Hotel-Mangement-DBMS-Mini-Project/blob/main/Screenshots/staff%20login.png?raw=true)
+
+Waiter:
+![Waiter](https://github.com/JitendraJoshi2000/Hotel-Mangement-DBMS-Mini-Project/blob/main/Screenshots/waiter.png?raw=true)
+
+Chef:
+![Chef](https://github.com/JitendraJoshi2000/Hotel-Mangement-DBMS-Mini-Project/blob/main/Screenshots/chef.png?raw=true)
+
+Generated Bill:
+![Generated Bill](https://github.com/JitendraJoshi2000/Hotel-Mangement-DBMS-Mini-Project/blob/main/Screenshots/bill.png?raw=true)
 
 
 <b>Database Schema:-</b>

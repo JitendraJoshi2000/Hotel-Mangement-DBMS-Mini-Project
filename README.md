@@ -48,7 +48,7 @@ Chef:
 ![Chef](https://github.com/JitendraJoshi2000/Hotel-Mangement-DBMS-Mini-Project/blob/main/Screenshots/chef.png?raw=true)
 
 Generated Bill:
-![Generated Bill](https://github.com/JitendraJoshi2000/Hotel-Mangement-DBMS-Mini-Project/blob/main/Screenshots/bill.png?raw=true)
+![Generated Bill](https://github.com/JitendraJoshi2000/Hotel-Mangement-DBMS-Mini-Project/blob/main/Screenshots/bill.png)
 
 
 <b>Database Schema:-</b>

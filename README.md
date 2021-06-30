@@ -76,4 +76,5 @@ Record_Order(order_no varchar primary key)
 Record_Items( name varchar, rate integer, quantity integer, category varchar, order_no varchar references Record_Order(order_no))
 
 ER Diagram:
+
 ![Generated Bill](https://github.com/JitendraJoshi2000/Hotel-Mangement-DBMS-Mini-Project/blob/main/Screenshots/ER%20Diagram.png)

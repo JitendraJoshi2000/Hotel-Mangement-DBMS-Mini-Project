@@ -1,4 +1,4 @@
-# Hotel-Mangement-DBMS-Mini-Project
+# Hotel-Management-DBMS-Mini-Project
 
 This is Hotel(Restaurant) management project that displays the menu of the hotel and takes orders from customers and generates bills which are recorded in database and also in file. We have considered requirements for the hotel side and have considered 3 major users i.e Customer, Chef, and Waiter.
 
